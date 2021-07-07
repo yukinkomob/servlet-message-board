@@ -62,11 +62,11 @@ public class MeetupServlet extends HttpServlet {
 			
 			msg.addReply(replyMsg);
 			
+			// TODO DB‚É•Û‘¶
 			session.setAttribute("list", list);
 			
 			RequestDispatcher rd = request.getRequestDispatcher("/meetup.jsp");
 			rd.forward(request, response);
-
 		} else {
 			// ƒRƒƒ“ƒg‚Ìˆ—
 			
@@ -87,9 +87,10 @@ public class MeetupServlet extends HttpServlet {
 			MeetupMessage msg = new MeetupMessage(id + 1, name, new Date(), comment);
 			
 			list.add(msg);
+			
+			// TODO DB‚É•Û‘¶
 			session.setAttribute("list", list);
 			session.setAttribute("id", id + 1);
-			
 			request.setAttribute("msg", msg);
 			
 			RequestDispatcher rd = request.getRequestDispatcher("/meetup.jsp");

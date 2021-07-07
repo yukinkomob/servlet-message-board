@@ -1,5 +1,6 @@
 package com.sample;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,15 @@ public class Comment {
 		this.createdAt = createdAt;
 		this.userName = userName;
 		this.replyList = replyList;
+	}
+	
+	public String getDateString() {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
+		return df.format(createdAt);
+	}
+	
+	public String getSample() {
+		return "sample22";
 	}
 
 	public int getId() {
