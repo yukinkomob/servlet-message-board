@@ -43,6 +43,9 @@ public class MeetupServlet extends HttpServlet {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
 		
+		// test
+		List<Comment> comments = new CommentDao().selectComment();
+		
 		HttpSession session = request.getSession();
 		Object argIsReply = request.getParameter("isReply");
 		boolean isReply = argIsReply != null ? argIsReply.equals("true") : false;

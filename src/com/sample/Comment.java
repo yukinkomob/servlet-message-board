@@ -1,5 +1,6 @@
 package com.sample;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,12 @@ public class Comment {
 	private String userName;
 	private List<Comment> replyList;
 
+	public Comment() {
+		super();
+		this.id = -1;
+		this.replyList = new ArrayList<>();
+	}
+	
 	public Comment(int id, String text, Date createdAt, String userName, List<Comment> replyList) {
 		super();
 		this.id = id;
@@ -23,19 +30,39 @@ public class Comment {
 		return id;
 	}
 
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public String getText() {
 		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
 	}
 
 	public Date getCreatedAt() {
 		return createdAt;
 	}
 
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
 	public String getUserName() {
 		return userName;
 	}
 
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public List<Comment> getReplyList() {
 		return replyList;
+	}
+
+	public void setReplyList(List<Comment> replyList) {
+		this.replyList = replyList;
 	}
 }
