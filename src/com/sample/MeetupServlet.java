@@ -19,37 +19,38 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/meetup")
 public class MeetupServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public MeetupServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public MeetupServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html; charset=UTF-8");
-		
-		// test
-		List<Comment> comments = new CommentDao().selectComment();
-		
+
 		HttpSession session = request.getSession();
 		Object argIsReply = request.getParameter("isReply");
 		boolean isReply = argIsReply != null ? argIsReply.equals("true") : false;
-		
+
 		if (isReply) {
 			// 返信の処理
 			int id = Integer.parseInt((String) request.getParameter("listId"));
@@ -58,47 +59,45 @@ public class MeetupServlet extends HttpServlet {
 
 			String name = request.getParameter("name");
 			String comment = request.getParameter("comment");
-			MeetupMessage replyMsg = new MeetupMessage(name, new Date(), comment);
-			
-			msg.addReply(replyMsg);
-			
+
+// 			MeetupMessage replyMsg = new MeetupMessage(name, new Date(), comment);
+//			msg.addReply(replyMsg);
+
 			// TODO DBに保存
-			session.setAttribute("list", list);
+//			session.setAttribute("list", list);
 			
+			// TODO name, comment を Comment コンストラクタに渡してインスタンスを生成し、CommentDao#insert()に渡す
+//			Comment comment = new Comment()
+
 			RequestDispatcher rd = request.getRequestDispatcher("/meetup.jsp");
 			rd.forward(request, response);
 		} else {
 			// コメントの処理
-			
+
 			List<MeetupMessage> list = (List<MeetupMessage>) session.getAttribute("list");
-			
+
 			if (list == null) {
 				list = new ArrayList<>();
 			}
-			
+
 			Integer id = (Integer) session.getAttribute("id");
 			if (id == null) {
 				id = 0;
 			}
-			
+
 			String name = request.getParameter("name");
-			String comment = request.getParameter("comment");
+			String commentText = request.getParameter("comment");
 			
-			MeetupMessage msg = new MeetupMessage(id + 1, name, new Date(), comment);
-			
-			list.add(msg);
-			
-			// TODO DBに保存
-			session.setAttribute("list", list);
-			session.setAttribute("id", id + 1);
-			request.setAttribute("msg", msg);
-			
+			Comment comment = new Comment();
+			comment.setUserName(name);
+			comment.setText(commentText);
+			CommentDao.insert(comment);
+
 			RequestDispatcher rd = request.getRequestDispatcher("/meetup.jsp");
 			rd.forward(request, response);
 		}
-		
+
 		return;
 	}
-	
-	
+
 }

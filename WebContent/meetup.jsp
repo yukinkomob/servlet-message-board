@@ -163,7 +163,7 @@
 
 				<!-- リストを取得する -->
 				<%
-					List<Comment> comments = new CommentDao().selectComment();
+					List<Comment> comments = CommentDao.selectComment();
 
 				request.setAttribute("data", comments);
 				%>

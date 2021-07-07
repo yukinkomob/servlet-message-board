@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CommentDao {
 
-	private Connection openConnection() throws SQLException {
+	private static Connection openConnection() throws SQLException {
 		String url = "jdbc:mysql://localhost:3306/message_board?useSSL=false";
 		String user = "root";
 		String password = "pappasu24";
@@ -27,7 +27,7 @@ public class CommentDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<Comment> selectComment() {
+	public static List<Comment> selectComment() {
 		Connection con = null;
 		List<Comment> list = new ArrayList<>();
 		try {
@@ -75,9 +75,10 @@ public class CommentDao {
 							Date date2 = new Date(ts2.getTime());
 							replyComment.setCreatedAt(date2);
 							replyComment.setText(rs3.getString("comment"));
-							
-							System.out.println("    id: " + replyComment.getId() + ", user_name: " + replyComment.getUserName() + ", date: "
-									+ replyComment.getCreatedAt().toString() + ", replyComment: " + replyComment.getText());
+
+							System.out.println("    id: " + replyComment.getId() + ", user_name: "
+									+ replyComment.getUserName() + ", date: " + replyComment.getCreatedAt().toString()
+									+ ", replyComment: " + replyComment.getText());
 
 							replyComments.add(replyComment);
 						}
@@ -99,7 +100,59 @@ public class CommentDao {
 		return list;
 	}
 
-	public void insert(Comment comment) {
+	public static void insert(Comment comment) {
+		Connection con = null;
+
+		try {
+			con = openConnection();
+			
+			// ユーザデータの存在確認
+			String userName = comment.getUserName();
+			PreparedStatement ps = con.prepareStatement("select * from user where user_name = ?");
+			ps.setString(1, userName);
+			ResultSet rs = ps.executeQuery();
+			
+			int userId = -1;
+			boolean existUserName = false; 
+			while (rs.next()) {
+				userId = rs.getInt("id");
+				existUserName = true;
+			}
+			
+			if (!existUserName) {
+				// ユーザ名をユーザテーブルに登録
+				ps = con.prepareStatement("insert into user (user_name) values (?);");
+				ps.setString(1, comment.getUserName());
+				ps.execute();
+				// ユーザIDの取得
+				ps = con.prepareStatement("select * from user where user_name = ?");
+				ps.setString(1, comment.getUserName());
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					userId = rs.getInt("id");
+				}
+			}
+			
+			// コメントをコメントテーブルに登録
+			ps = con.prepareStatement("insert into comments (comment, user_id) values (?, ?)");
+			ps.setString(1, comment.getText());
+			ps.setInt(2, userId);
+			ps.execute();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void insertReply(int commentId, Comment replyComment) {
 
 	}
 }
