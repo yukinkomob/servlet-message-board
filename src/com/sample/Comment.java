@@ -31,10 +31,6 @@ public class Comment {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd E HH:mm:ss");
 		return df.format(createdAt);
 	}
-	
-	public String getSample() {
-		return "sample22";
-	}
 
 	public int getId() {
 		return id;

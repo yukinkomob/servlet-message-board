@@ -168,12 +168,6 @@
 				request.setAttribute("data", comments);
 				%>
 
-				<!-- 
-          <c:forEach var="obj" items="${data}" varStatus="status">
-          	<c:out value="${ obj.userName }" /><br>
-          </c:forEach>
-          -->
-
 				<c:forEach items="${ data }" var="msg" varStatus="status">
 
 					<div class="flex justify-between p-4">
@@ -215,13 +209,6 @@
 									type="submit" value="返信する">
 							</form>
 							<!-- 返信メッセージ -->
-
-							<%
-								// request.setAttribute("dateStr", ${msg}.getSample());
-							%>
-
-							<c:out value="${ rmsg.sample }" />
-							<!-- <c:out value="${ dateStr }" /> -->
 							<c:forEach items="${ msg.replyList }" var="rmsg"
 								varStatus="status">
 
