@@ -200,7 +200,7 @@
 							<!-- 返信のフォーム -->
 							<form action="meetup" method="post">
 								<input type="hidden" name="isReply" value="true"> <input
-									type="hidden" name="listId" value="${ msg.id - 1 }"> <input
+									type="hidden" name="msgId" value="${ msg.id }"> <input
 									class="border-2 p-1 pl-4 z-10 relative mb-2" type="text"
 									name="name" placeholder="名　前"> <input
 									class="border-2 w-full p-2" type="text" name="comment"

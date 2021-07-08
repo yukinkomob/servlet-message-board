@@ -53,21 +53,16 @@ public class MeetupServlet extends HttpServlet {
 
 		if (isReply) {
 			// 返信の処理
-			int id = Integer.parseInt((String) request.getParameter("listId"));
-			List<MeetupMessage> list = (List<MeetupMessage>) session.getAttribute("list");
-			MeetupMessage msg = list.get(id);
+			int id = Integer.parseInt((String) request.getParameter("msgId"));
 
 			String name = request.getParameter("name");
-			String comment = request.getParameter("comment");
-
-// 			MeetupMessage replyMsg = new MeetupMessage(name, new Date(), comment);
-//			msg.addReply(replyMsg);
-
-			// TODO DBに保存
-//			session.setAttribute("list", list);
+			String commentText = request.getParameter("comment");
 			
-			// TODO name, comment を Comment コンストラクタに渡してインスタンスを生成し、CommentDao#insert()に渡す
-//			Comment comment = new Comment()
+			Comment comment = new Comment();
+			comment.setUserName(name);
+			comment.setText(commentText);
+			
+			CommentDao.insertReply(id, comment);
 
 			RequestDispatcher rd = request.getRequestDispatcher("/meetup.jsp");
 			rd.forward(request, response);

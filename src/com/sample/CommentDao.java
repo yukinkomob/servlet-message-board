@@ -152,7 +152,79 @@ public class CommentDao {
 		}
 	}
 
-	public void insertReply(int commentId, Comment replyComment) {
+	/**
+	 * 
+	 * @param commentId 返信元のコメントID
+	 * @param replyComment 返信コメント
+	 */
+	public static void insertReply(int commentId, Comment replyComment) {
+		Connection con = null;
 
+		try {
+			con = openConnection();
+			
+			// ユーザデータの存在確認
+			String userName = replyComment.getUserName();
+			PreparedStatement ps = con.prepareStatement("select * from user where user_name = ?");
+			ps.setString(1, userName);
+			ResultSet rs = ps.executeQuery();
+			
+			int userId = -1;
+			boolean existUserName = false; 
+			while (rs.next()) {
+				userId = rs.getInt("id");
+				existUserName = true;
+			}
+			
+			if (!existUserName) {
+				// ユーザ名をユーザテーブルに登録
+				ps = con.prepareStatement("insert into user (user_name) values (?);");
+				ps.setString(1, replyComment.getUserName());
+				ps.execute();
+				// ユーザIDの取得
+				ps = con.prepareStatement("select * from user where user_name = ?");
+				ps.setString(1, replyComment.getUserName());
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					userId = rs.getInt("id");
+				}
+			}
+			
+			// コメントをコメントテーブルに登録
+			ps = con.prepareStatement("insert into comments (comment, user_id) values (?, ?)");
+			ps.setString(1, replyComment.getText());
+			ps.setInt(2, userId);
+			ps.execute();
+			
+			// 最新のコメントIDを取得（かつ今回登録したコメント内容と合致するコメントのIDであること）
+			ps = con.prepareStatement("select * from comments where comment = ? and user_id = ? order by created_at desc limit 1");
+			ps.setString(1, replyComment.getText());
+			ps.setInt(2,  userId);
+			rs = ps.executeQuery();
+			int insertedCommentId = -1;
+			while (rs.next()) {
+				insertedCommentId = rs.getInt("id");
+			}
+			if (insertedCommentId == -1) {
+				throw new IllegalStateException("bad implementation.");
+			}
+			
+			// 返信コメントIDを返信テーブルに登録
+			ps = con.prepareStatement("insert into replies (comment_id, reply_comment_id) values (?, ?)");
+			ps.setInt(1, commentId);
+			ps.setInt(2,  insertedCommentId);
+			ps.execute();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
