@@ -1,5 +1,7 @@
-package com.sample;
+package com.sample.dao;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,6 +11,13 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import com.sample.Comment;
 
 public class CommentDao {
 
@@ -28,6 +37,28 @@ public class CommentDao {
 	 * @throws SQLException
 	 */
 	public static List<Comment> selectComment() {
+		
+		{
+			String resource = "config.xml";
+			InputStream inputStream;
+			try {
+				inputStream = Resources.getResourceAsStream(resource);
+				
+				SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+				
+				SqlSession session = sqlSessionFactory.openSession();
+				
+				System.out.println("session success.");
+				
+				session.close();
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
 		Connection con = null;
 		List<Comment> list = new ArrayList<>();
 		try {

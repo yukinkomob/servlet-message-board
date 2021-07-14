@@ -6,7 +6,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Date"%>
 <%@ page import="com.sample.Comment"%>
-<%@ page import="com.sample.CommentDao"%>
+<%@ page import="com.sample.dao.CommentDao"%>
 <!DOCTYPE html>
 <html>
 <head>
