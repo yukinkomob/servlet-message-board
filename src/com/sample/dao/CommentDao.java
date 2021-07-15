@@ -18,6 +18,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import com.sample.Comment;
+import com.sample.Comment2;
 
 public class CommentDao {
 
@@ -47,8 +48,19 @@ public class CommentDao {
 				SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 				
 				SqlSession session = sqlSessionFactory.openSession();
-				
 				System.out.println("session success.");
+				
+				CommentDao2 dao = session.getMapper(CommentDao2.class);
+				List<Comment2> list = dao.selectCommentById(1);
+				for (Comment2 c : list) {
+					System.out.println("id: " + c.getId());
+					System.out.println("replyId: " + c.getReplyId());
+					System.out.println("-------------------");
+//					System.out.println("userName: " + c.getUserName());
+//					System.out.println("comment: " + c.getComment());
+//					System.out.println("createdAt: " + c.getCreatedAt());
+//					System.out.println("userId: " + c.getUserId());
+				}
 				
 				session.close();
 

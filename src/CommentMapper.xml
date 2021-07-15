@@ -3,4 +3,25 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sample.dao.CommentDao2">
+	<resultMap type="com.sample.Comment2" id="commentResult1">
+		<result column="id" property="id" />
+		<result column="user_name" property="userName" />
+	</resultMap>
+	<resultMap type="com.sample.Comment2" id="commentResult2">
+		<result column="comment_id" property="id" />
+		<result column="reply_comment_id" property="replyId" />
+	</resultMap>
+	<resultMap type="com.sample.Comment2" id="commentResult3">
+		<result column="id" property="id" />
+		<result column="comment" property="comment" />
+		<result column="created_at" property="createdAt" />
+		<result column="user_id" property="userId" />
+	</resultMap>	
+	<resultMap type="com.sample.Comment2" id="commentResult4">
+		<result column="id" property="id" />
+		<result column="comment" property="comment" />
+		<result column="created_at" property="createdAt" />
+		<result column="user_id" property="userId" />
+		<result column="user_name" property="userName" />
+	</resultMap>
 </mapper>
