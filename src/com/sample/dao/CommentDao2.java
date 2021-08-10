@@ -3,6 +3,7 @@ package com.sample.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 
@@ -28,7 +29,7 @@ public interface CommentDao2 {
 	 */
 	@ResultMap("commentResult2")
 	@Select("select * from replies where comment_id = #{id}")
-	List<Comment2> selectCommentById(int commentId);
+	List<Comment2> selectReplyIdsByCommentId(int commentId);
 
 	/**
 	 * 返信IDを指定してコメントデータを取得
@@ -38,7 +39,7 @@ public interface CommentDao2 {
 	 */
 	@ResultMap("commentResult4")
 	@Select("select comments.id, comment, created_at, user_id, user_name from comments inner join user where comments.id = #{id} and comments.user_id = user.id")
-	List<Comment2> selectCommentByReplyId(int replyCommentId);
+	List<Comment2> selectCommentByCommentId(int replyCommentId);
 
 	/**
 	 * ユーザデータの存在確認
@@ -57,14 +58,14 @@ public interface CommentDao2 {
 	 */
 	@ResultMap("commentResult3")
 	@Select("select * from comments where comment = #{text} and user_id = #{userId} order by created_at desc limit 1")
-	Comment selectLatestComment();
-
+	Comment2 selectLatestComment(@Param("text") String text, @Param("userId") int userId);
+	
 	/**
 	 * ユーザ名をユーザテーブルに登録
 	 * 
 	 * @param userName
 	 */
-	@Insert("insert into user (user_name) values (#{userName});")
+	// このメソッドに限ってはSQL文をCommentMapperで定義している
 	void insertUserName(String userName);
 
 	/**

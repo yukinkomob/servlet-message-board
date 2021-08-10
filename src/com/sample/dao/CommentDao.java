@@ -38,38 +38,9 @@ public class CommentDao {
 	 * @throws SQLException
 	 */
 	public static List<Comment> selectComment() {
-		
 		{
-			String resource = "config.xml";
-			InputStream inputStream;
-			try {
-				inputStream = Resources.getResourceAsStream(resource);
-				
-				SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-				
-				SqlSession session = sqlSessionFactory.openSession();
-				System.out.println("session success.");
-				
-				CommentDao2 dao = session.getMapper(CommentDao2.class);
-				List<Comment2> list = dao.selectCommentById(1);
-				for (Comment2 c : list) {
-					System.out.println("id: " + c.getId());
-					System.out.println("replyId: " + c.getReplyId());
-					System.out.println("-------------------");
-//					System.out.println("userName: " + c.getUserName());
-//					System.out.println("comment: " + c.getComment());
-//					System.out.println("createdAt: " + c.getCreatedAt());
-//					System.out.println("userId: " + c.getUserId());
-				}
-				
-				session.close();
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			CommentDao2Test.execute();
 		}
-		
 		
 		Connection con = null;
 		List<Comment> list = new ArrayList<>();
@@ -88,8 +59,9 @@ public class CommentDao {
 				comment.setCreatedAt(date);
 				comment.setText(rs.getString("comment"));
 
-				System.out.println("id: " + comment.getId() + ", user_name: " + comment.getUserName() + ", date: "
-						+ comment.getCreatedAt().toString() + ", comment: " + comment.getText());
+				
+//				System.out.println("id: " + comment.getId() + ", user_name: " + comment.getUserName() + ", date: "
+//						+ comment.getCreatedAt().toString() + ", comment: " + comment.getText());
 				list.add(comment);
 
 				// 返信コメントを返信リストに設定
@@ -119,9 +91,9 @@ public class CommentDao {
 							replyComment.setCreatedAt(date2);
 							replyComment.setText(rs3.getString("comment"));
 
-							System.out.println("    id: " + replyComment.getId() + ", user_name: "
-									+ replyComment.getUserName() + ", date: " + replyComment.getCreatedAt().toString()
-									+ ", replyComment: " + replyComment.getText());
+//							System.out.println("    id: " + replyComment.getId() + ", user_name: "
+//									+ replyComment.getUserName() + ", date: " + replyComment.getCreatedAt().toString()
+//									+ ", replyComment: " + replyComment.getText());
 
 							replyComments.add(replyComment);
 						}
