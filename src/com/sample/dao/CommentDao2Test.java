@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.io.Resources;
@@ -20,11 +21,13 @@ public class CommentDao2Test {
 	static void execute() {
 		System.out.println("CommentDao2Test");
 //		selectAllCommentsTest();
-//		selectCommentByIdTest();
-//		selectCommentByCommentIdTest();
+//		selectReplyIdsByCommentIdTest(1);
+//		selectCommentByCommentIdTest(1);
 //		selectUserByUserNameTest("山田　和夫");
-//		selectLatestCommentTest();
-		insertUserNameTest();
+//		selectLatestCommentTest("bbb", 19);
+//		insertUserNameTest("ccc");
+//		insertCommentTest("今日は英語の勉強がしたい気分です。", 116);
+//		insertReplyCommentIdTest(25, 33);
 	}
 
 	static SqlSession openSqlSession() {
@@ -85,13 +88,13 @@ public class CommentDao2Test {
 	 */
 //	@ResultMap("commentResult2")
 //	@Select("select * from replies where comment_id = #{id}")
-	static void selectReplyIdsByCommentIdTest() {
+	static void selectReplyIdsByCommentIdTest(int commentId) {
 		System.out.println("selectReplyIdsByCommentIdTest");
 		
 		SqlSession session = openSqlSession();
 
 		CommentDao2 dao = session.getMapper(CommentDao2.class);
-		List<Comment2> list = dao.selectReplyIdsByCommentId(1);
+		List<Comment2> list = dao.selectReplyIdsByCommentId(commentId);
 		for (Comment2 c : list) {
 			System.out.println("id: " + c.getId());
 			System.out.println("replyId: " + c.getReplyId());
@@ -111,13 +114,13 @@ public class CommentDao2Test {
 	 */
 //	@ResultMap("commentResult4")
 //	@Select("select comments.id, comment, created_at, user_id, user_name from comments inner join user where comments.id = #{id} and comments.user_id = user.id")
-	static void selectCommentByCommentIdTest() {
+	static void selectCommentByCommentIdTest(int replyCommentId) {
 		System.out.println("selectCommentByCommentIdTest");
 		
 		SqlSession session = openSqlSession();
 
 		CommentDao2 dao = session.getMapper(CommentDao2.class);
-		List<Comment2> list = dao.selectCommentByCommentId(1);
+		List<Comment2> list = dao.selectCommentByCommentId(replyCommentId);
 		for (Comment2 c : list) {
 			System.out.println("id: " + c.getId());
 			System.out.println("userName: " + c.getUserName());
@@ -163,13 +166,13 @@ public class CommentDao2Test {
 	 */
 //	@ResultMap("commentResult3")
 //	@Select("select * from comments where comment = #{comment} and user_id = #{userId} order by created_at desc limit 1")
-	static void selectLatestCommentTest() {
+	static void selectLatestCommentTest(String text, int userId) {
 		System.out.println("selectLatestCommentTest");
 		
 		SqlSession session = openSqlSession();
 
 		CommentDao2 dao = session.getMapper(CommentDao2.class);
-		Comment2 c = dao.selectLatestComment("bbb", 19);
+		Comment2 c = dao.selectLatestComment(text, userId);
 		System.out.println("id: " + c.getId());
 		System.out.println("comment: " + c.getComment());
 		System.out.println("createdAt: " + c.getCreatedAt());
@@ -184,13 +187,13 @@ public class CommentDao2Test {
 	 * @param userName
 	 */
 //	@Insert("insert into user (user_name) values (#{userName});")
-	static void insertUserNameTest() {
+	static void insertUserNameTest(String userName) {
 		System.out.println("insertUserNameTest");
 		
 		SqlSession session = openSqlSession();
 		
 		CommentDao2 dao = session.getMapper(CommentDao2.class);
-		dao.insertUserName("eee");
+		dao.insertUserName(userName);
 		System.out.println("-------------------");
 		commitAndCloseSqlSession(session);
 	}
@@ -205,6 +208,12 @@ public class CommentDao2Test {
 	static void insertCommentTest(String comment, int userId) {
 		System.out.println("insertCommentTest");
 		
+		SqlSession session = openSqlSession();
+		
+		CommentDao2 dao = session.getMapper(CommentDao2.class);
+		dao.insertComment(comment, userId);
+		System.out.println("-------------------");
+		commitAndCloseSqlSession(session);
 	}
 
 	/**
@@ -217,5 +226,11 @@ public class CommentDao2Test {
 	static void insertReplyCommentIdTest(int commentId, int replyCommentId) {
 		System.out.println("insertReplyCommentIdTest");
 		
+		SqlSession session = openSqlSession();
+		
+		CommentDao2 dao = session.getMapper(CommentDao2.class);
+		dao.insertReplyCommentId(commentId, replyCommentId);
+		System.out.println("-------------------");
+		commitAndCloseSqlSession(session);
 	}
 }

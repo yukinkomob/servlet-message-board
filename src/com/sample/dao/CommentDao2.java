@@ -74,8 +74,8 @@ public interface CommentDao2 {
 	 * @param comment
 	 * @param userId
 	 */
-	@Insert("insert into comments (comment, user_id) values (#{text}, #{userId})")
-	void insertComment(String comment, int userId);
+	@Insert("insert into comments (comment, user_id) values (#{comment}, #{userId})")
+	void insertComment(@Param("comment") String comment, @Param("userId") int userId);
 
 	/**
 	 * 返信コメントIDを返信テーブルに登録
@@ -84,5 +84,5 @@ public interface CommentDao2 {
 	 * @param replyCommentId
 	 */
 	@Insert("insert into replies (comment_id, reply_comment_id) values (#{id}, #{replyId})")
-	void insertReplyCommentId(int commentId, int replyCommentId);
+	void insertReplyCommentId(@Param("id") int commentId, @Param("replyId") int replyCommentId);
 }
