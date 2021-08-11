@@ -1,6 +1,7 @@
 package com.sample;
 
 import java.util.Date;
+import java.util.List;
 
 public class Comment2 {
 	private int id;
@@ -9,6 +10,7 @@ public class Comment2 {
 	private String comment;
 	private Date createdAt;
 	private String userName;
+	private List<Comment2> replyList;
 
 	public int getId() {
 		return id;
@@ -56,5 +58,13 @@ public class Comment2 {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+	
+	public List<Comment2> getReplyList() {
+		return replyList;
+	}
+
+	public void setReplyList(List<Comment2> replyList) {
+		this.replyList = replyList;
 	}
 }

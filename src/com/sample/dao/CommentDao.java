@@ -22,12 +22,42 @@ import com.sample.Comment2;
 
 public class CommentDao {
 
+	// 削除する予定
 	private static Connection openConnection() throws SQLException {
 		String url = "jdbc:mysql://localhost:3306/message_board?useSSL=false";
 		String user = "root";
 		String password = "pappasu24";
 
 		return DriverManager.getConnection(url, user, password);
+	}
+	
+	static SqlSession openSqlSession() {
+		String resource = "config.xml";
+		InputStream inputStream;
+		try {
+			inputStream = Resources.getResourceAsStream(resource);
+
+			SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+			SqlSession session = sqlSessionFactory.openSession();
+			return session;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	static void commitSqlSession(SqlSession session) {
+		session.commit();
+	}
+	
+	static void commitAndCloseSqlSession(SqlSession session) {
+		session.commit();
+		session.close();
+	}
+
+	static void closeSqlSession(SqlSession session) {
+		session.close();
 	}
 
 	/**
@@ -37,82 +67,101 @@ public class CommentDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Comment> selectComment() {
+	public static List<Comment2> selectComment() {
+		System.out.println("selectComment");
 		{
-			CommentDao2Test.execute();
+			// テスト用メソッドの実行
+//			CommentDao2Test.execute();
 		}
 		
-		Connection con = null;
-		List<Comment> list = new ArrayList<>();
-		try {
-			con = openConnection();
-			PreparedStatement ps = con.prepareStatement(
-					"select comments.id, comments.comment, comments.created_at, comments.user_id, user.user_name from comments inner join user on user.id = comments.user_id where not exists (select * from replies where comments.id = replies.reply_comment_id)");
-			ResultSet rs = ps.executeQuery();
+//		Connection con = null;
+//		List<Comment> list = new ArrayList<>();
+//		try {
+//			con = openConnection();
+//			PreparedStatement ps = con.prepareStatement(
+//					"select comments.id, comments.comment, comments.created_at, comments.user_id, user.user_name from comments inner join user on user.id = comments.user_id where not exists (select * from replies where comments.id = replies.reply_comment_id)");
+//			ResultSet rs = ps.executeQuery();
+			
+			SqlSession session = openSqlSession();
+			
+			CommentDao2 dao = session.getMapper(CommentDao2.class);
+			List<Comment2> commentList = dao.selectAllComments();
 
-			while (rs.next()) {
-				Comment comment = new Comment();
-				comment.setId(rs.getInt("id"));
-				comment.setUserName(rs.getString("user_name"));
-				Timestamp ts = rs.getTimestamp("created_at");
-				Date date = new Date(ts.getTime());
-				comment.setCreatedAt(date);
-				comment.setText(rs.getString("comment"));
+			for (Comment2 c : commentList) {
+				System.out.println("selectComment2");
+//			while (rs.next()) {
+//				Comment comment = new Comment();
+//				comment.setId(rs.getInt("id"));
+//				comment.setUserName(rs.getString("user_name"));
+//				Timestamp ts = rs.getTimestamp("created_at");
+//				Date date = new Date(ts.getTime());
+//				comment.setCreatedAt(date);
+//				comment.setText(rs.getString("comment"));
 
 				
 //				System.out.println("id: " + comment.getId() + ", user_name: " + comment.getUserName() + ", date: "
 //						+ comment.getCreatedAt().toString() + ", comment: " + comment.getText());
-				list.add(comment);
+//				list.add(comment);
 
 				// 返信コメントを返信リストに設定
-				List<Comment> replyComments = new ArrayList<>();
-				{
+//				List<Comment> replyComments = new ArrayList<>();
+				List<Comment2> replyComments = new ArrayList<>();
+				
 					// 指定コメントIDに紐づく返信IDを取得
-					PreparedStatement ps2 = con.prepareStatement("select * from replies where comment_id = ?");
-					ps2.setInt(1, comment.getId());
-					ResultSet rs2 = ps2.executeQuery();
+//					PreparedStatement ps2 = con.prepareStatement("select * from replies where comment_id = ?");
+//					ps2.setInt(1, comment.getId());
+//					ResultSet rs2 = ps2.executeQuery();
+					
+				List<Comment2> replyIds = dao.selectReplyIdsByCommentId(c.getId());
 
-					while (rs2.next()) {
-						int replyId = rs2.getInt("reply_comment_id");
+				for (Comment2 replyId : replyIds) {
+					System.out.println("selectComment3");
+//					while (rs2.next()) {
+//						int replyId = rs2.getInt("reply_comment_id");
 
 						// 返信IDを指定してコメントデータを取得
-						PreparedStatement ps3 = con.prepareStatement(
-								"select comments.id, comment, created_at, user_id, user_name from comments inner join user where comments.id = ? and comments.user_id = user.id");
-						ps3.setInt(1, replyId);
-						ResultSet rs3 = ps3.executeQuery();
-
-						while (rs3.next()) {
+//						PreparedStatement ps3 = con.prepareStatement(
+//								"select comments.id, comment, created_at, user_id, user_name from comments inner join user where comments.id = ? and comments.user_id = user.id");
+//						ps3.setInt(1, replyId);
+//						ResultSet rs3 = ps3.executeQuery();
+						
+					replyComments = dao.selectCommentByCommentId(replyId.getReplyId());
+//					for (Comment2 rc : replyComments) {
+//						for (Comment2 replyComment : replyComments) {
+//						while (rs3.next()) {
 							// 返信コメントのインスタンスを生成
-							Comment replyComment = new Comment();
-							replyComment.setId(rs3.getInt("id"));
-							replyComment.setUserName(rs3.getString("user_name"));
-							Timestamp ts2 = rs3.getTimestamp("created_at");
-							Date date2 = new Date(ts2.getTime());
-							replyComment.setCreatedAt(date2);
-							replyComment.setText(rs3.getString("comment"));
+//							Comment replyComment = new Comment();
+//							replyComment.setId(rs3.getInt("id"));
+//							replyComment.setUserName(rs3.getString("user_name"));
+//							Timestamp ts2 = rs3.getTimestamp("created_at");
+//							Date date2 = new Date(ts2.getTime());
+//							replyComment.setCreatedAt(date2);
+//							replyComment.setText(rs3.getString("comment"));
 
 //							System.out.println("    id: " + replyComment.getId() + ", user_name: "
 //									+ replyComment.getUserName() + ", date: " + replyComment.getCreatedAt().toString()
 //									+ ", replyComment: " + replyComment.getText());
 
-							replyComments.add(replyComment);
-						}
-					}
+//							replyComments.add(replyComment);
+//						replyComments.add(rc);
+//					}
 				}
-				comment.setReplyList(replyComments);
+				c.setReplyList(replyComments);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return list;
+			closeSqlSession(session);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (con != null) {
+//				try {
+//					con.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+		System.out.println("selectComment999");
+		return commentList;
 	}
 
 	public static void insert(Comment comment) {

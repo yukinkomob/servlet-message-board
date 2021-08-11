@@ -6,6 +6,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Date"%>
 <%@ page import="com.sample.Comment"%>
+<%@ page import="com.sample.Comment2"%>
 <%@ page import="com.sample.dao.CommentDao"%>
 <!DOCTYPE html>
 <html>
@@ -163,7 +164,7 @@
 
 				<!-- リストを取得する -->
 				<%
-					List<Comment> comments = CommentDao.selectComment();
+					List<Comment2> comments = CommentDao.selectComment();
 
 				request.setAttribute("data", comments);
 				%>
@@ -194,7 +195,7 @@
 						<!-- 返信コメント -->
 						<div class="bg-white w-full h-auto mr-12 rounded-2xl p-6">
 							<p>
-								<c:out value="${ msg.text }" />
+								<c:out value="${ msg.comment }" />
 							</p>
 							<hr class="my-4 border-green-200">
 							<!-- 返信のフォーム -->
@@ -228,7 +229,7 @@
 										</p>
 										<hr class="my-2">
 										<p class="text-sm">
-											<c:out value="${ rmsg.text }" />
+											<c:out value="${ rmsg.comment }" />
 										</p>
 									</div>
 								</div>
