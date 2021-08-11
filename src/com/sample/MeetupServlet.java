@@ -60,9 +60,9 @@ public class MeetupServlet extends HttpServlet {
 			String name = request.getParameter("name");
 			String commentText = request.getParameter("comment");
 			
-			Comment comment = new Comment();
+			Comment2 comment = new Comment2();
 			comment.setUserName(name);
-			comment.setText(commentText);
+			comment.setComment(commentText);
 			
 			CommentDao.insertReply(id, comment);
 

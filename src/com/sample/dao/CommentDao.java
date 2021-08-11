@@ -68,7 +68,7 @@ public class CommentDao {
 	 * @throws SQLException
 	 */
 	public static List<Comment2> selectComment() {
-		System.out.println("selectComment");
+//		System.out.println("selectComment");
 		{
 			// テスト用メソッドの実行
 //			CommentDao2Test.execute();
@@ -88,7 +88,7 @@ public class CommentDao {
 			List<Comment2> commentList = dao.selectAllComments();
 
 			for (Comment2 c : commentList) {
-				System.out.println("selectComment2");
+//				System.out.println("selectComment2");
 //			while (rs.next()) {
 //				Comment comment = new Comment();
 //				comment.setId(rs.getInt("id"));
@@ -115,7 +115,7 @@ public class CommentDao {
 				List<Comment2> replyIds = dao.selectReplyIdsByCommentId(c.getId());
 
 				for (Comment2 replyId : replyIds) {
-					System.out.println("selectComment3");
+//					System.out.println("selectComment3");
 //					while (rs2.next()) {
 //						int replyId = rs2.getInt("reply_comment_id");
 
@@ -160,7 +160,7 @@ public class CommentDao {
 //				}
 //			}
 //		}
-		System.out.println("selectComment999");
+//		System.out.println("selectComment999");
 		return commentList;
 	}
 
@@ -232,6 +232,7 @@ public class CommentDao {
 //				}
 //			}
 //		}
+		closeSqlSession(session);
 	}
 
 	/**
@@ -239,74 +240,100 @@ public class CommentDao {
 	 * @param commentId 返信元のコメントID
 	 * @param replyComment 返信コメント
 	 */
-	public static void insertReply(int commentId, Comment replyComment) {
-		Connection con = null;
+	public static void insertReply(int commentId, Comment2 replyComment) {
+		SqlSession session = openSqlSession();
+		CommentDao2 dao = session.getMapper(CommentDao2.class);
+//		Connection con = null;
 
-		try {
-			con = openConnection();
+//		try {
+//			con = openConnection();
 			
 			// ユーザデータの存在確認
-			String userName = replyComment.getUserName();
-			PreparedStatement ps = con.prepareStatement("select * from user where user_name = ?");
-			ps.setString(1, userName);
-			ResultSet rs = ps.executeQuery();
+			List<Comment2> users = dao.selectUsersByUserName(replyComment.getUserName());
+			
+//			String userName = replyComment.getUserName();
+//			PreparedStatement ps = con.prepareStatement("select * from user where user_name = ?");
+//			ps.setString(1, userName);
+//			ResultSet rs = ps.executeQuery();
+			
+//			int userId = -1;
+//			boolean existUserName = false; 
+//			while (rs.next()) {
+//				userId = rs.getInt("id");
+//				existUserName = true;
+//			}
 			
 			int userId = -1;
-			boolean existUserName = false; 
-			while (rs.next()) {
-				userId = rs.getInt("id");
-				existUserName = true;
-			}
-			
-			if (!existUserName) {
+			if (users.size() == 0) {
 				// ユーザ名をユーザテーブルに登録
-				ps = con.prepareStatement("insert into user (user_name) values (?);");
-				ps.setString(1, replyComment.getUserName());
-				ps.execute();
+				dao.insertUserName(replyComment.getUserName());
+				commitSqlSession(session);
+			
+//			if (!existUserName) {
+				// ユーザ名をユーザテーブルに登録
+//				ps = con.prepareStatement("insert into user (user_name) values (?);");
+//				ps.setString(1, replyComment.getUserName());
+//				ps.execute();
+				
 				// ユーザIDの取得
-				ps = con.prepareStatement("select * from user where user_name = ?");
-				ps.setString(1, replyComment.getUserName());
-				rs = ps.executeQuery();
-				while (rs.next()) {
-					userId = rs.getInt("id");
+				users = dao.selectUsersByUserName(replyComment.getUserName());
+				if (users.size() != 0) {
+					userId = users.get(0).getId();
 				}
+//				ps = con.prepareStatement("select * from user where user_name = ?");
+//				ps.setString(1, replyComment.getUserName());
+//				rs = ps.executeQuery();
+//				while (rs.next()) {
+//					userId = rs.getInt("id");
+//				}
 			}
 			
 			// コメントをコメントテーブルに登録
-			ps = con.prepareStatement("insert into comments (comment, user_id) values (?, ?)");
-			ps.setString(1, replyComment.getText());
-			ps.setInt(2, userId);
-			ps.execute();
+			dao.insertComment(replyComment.getComment(), userId);
+			commitSqlSession(session);
+			
+//			ps = con.prepareStatement("insert into comments (comment, user_id) values (?, ?)");
+//			ps.setString(1, replyComment.getText());
+//			ps.setInt(2, userId);
+//			ps.execute();
 			
 			// 最新のコメントIDを取得（かつ今回登録したコメント内容と合致するコメントのIDであること）
-			ps = con.prepareStatement("select * from comments where comment = ? and user_id = ? order by created_at desc limit 1");
-			ps.setString(1, replyComment.getText());
-			ps.setInt(2,  userId);
-			rs = ps.executeQuery();
+			Comment2 c = dao.selectLatestComment(replyComment.getComment(), userId);
+			
+//			ps = con.prepareStatement("select * from comments where comment = ? and user_id = ? order by created_at desc limit 1");
+//			ps.setString(1, replyComment.getComment());
+//			ps.setInt(2,  userId);
+//			rs = ps.executeQuery();
 			int insertedCommentId = -1;
-			while (rs.next()) {
-				insertedCommentId = rs.getInt("id");
+//			while (rs.next()) {
+//				insertedCommentId = rs.getInt("id");
+//			}
+			if (c != null) {
+				insertedCommentId = c.getId();
 			}
 			if (insertedCommentId == -1) {
 				throw new IllegalStateException("bad implementation.");
 			}
 			
 			// 返信コメントIDを返信テーブルに登録
-			ps = con.prepareStatement("insert into replies (comment_id, reply_comment_id) values (?, ?)");
-			ps.setInt(1, commentId);
-			ps.setInt(2,  insertedCommentId);
-			ps.execute();
+			dao.insertReplyCommentId(commentId, insertedCommentId);
+			commitSqlSession(session);
+//			ps = con.prepareStatement("insert into replies (comment_id, reply_comment_id) values (?, ?)");
+//			ps.setInt(1, commentId);
+//			ps.setInt(2,  insertedCommentId);
+//			ps.execute();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (con != null) {
+//				try {
+//					con.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
+		closeSqlSession(session);
 	}
 }
