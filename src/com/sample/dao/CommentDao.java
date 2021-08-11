@@ -165,55 +165,73 @@ public class CommentDao {
 	}
 
 	public static void insert(Comment comment) {
-		Connection con = null;
+//		Connection con = null;
+		
+		SqlSession session = openSqlSession();
+		CommentDao2 dao = session.getMapper(CommentDao2.class);
 
-		try {
-			con = openConnection();
+//		try {
+//			con = openConnection();
 			
-			// ユーザデータの存在確認
-			String userName = comment.getUserName();
-			PreparedStatement ps = con.prepareStatement("select * from user where user_name = ?");
-			ps.setString(1, userName);
-			ResultSet rs = ps.executeQuery();
+		// ユーザデータの存在確認
+		List<Comment2> users = dao.selectUsersByUserName(comment.getUserName());
+		
+//			String userName = comment.getUserName();
+//			PreparedStatement ps = con.prepareStatement("select * from user where user_name = ?");
+//			ps.setString(1, userName);
+//			ResultSet rs = ps.executeQuery();
 			
-			int userId = -1;
-			boolean existUserName = false; 
-			while (rs.next()) {
-				userId = rs.getInt("id");
-				existUserName = true;
+//			int userId = -1;
+//			boolean existUserName = false; 
+//			while (rs.next()) {
+//				userId = rs.getInt("id");
+//				existUserName = true;
+//			}
+			
+//			if (!existUserName) {
+		int userId = -1;
+		if (users.size() == 0) {
+			// ユーザ名をユーザテーブルに登録
+			dao.insertUserName(comment.getUserName());
+			commitSqlSession(session);
+			
+//			ps = con.prepareStatement("insert into user (user_name) values (?);");
+//			ps.setString(1, comment.getUserName());
+//			ps.execute();
+			// ユーザIDの取得
+			users = dao.selectUsersByUserName(comment.getUserName());
+//			ps = con.prepareStatement("select * from user where user_name = ?");
+//			ps.setString(1, comment.getUserName());
+//			rs = ps.executeQuery();
+			
+			if (users.size() != 0) {
+				userId = users.get(0).getId();
 			}
-			
-			if (!existUserName) {
-				// ユーザ名をユーザテーブルに登録
-				ps = con.prepareStatement("insert into user (user_name) values (?);");
-				ps.setString(1, comment.getUserName());
-				ps.execute();
-				// ユーザIDの取得
-				ps = con.prepareStatement("select * from user where user_name = ?");
-				ps.setString(1, comment.getUserName());
-				rs = ps.executeQuery();
-				while (rs.next()) {
-					userId = rs.getInt("id");
-				}
-			}
+//			while (rs.next()) {
+//				userId = rs.getInt("id");
+//			}
+		}
 			
 			// コメントをコメントテーブルに登録
-			ps = con.prepareStatement("insert into comments (comment, user_id) values (?, ?)");
-			ps.setString(1, comment.getText());
-			ps.setInt(2, userId);
-			ps.execute();
+			dao.insertComment(comment.getText(), userId);
+			commitSqlSession(session);
+		
+//			ps = con.prepareStatement("insert into comments (comment, user_id) values (?, ?)");
+//			ps.setString(1, comment.getText());
+//			ps.setInt(2, userId);
+//			ps.execute();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} finally {
+//			if (con != null) {
+//				try {
+//					con.close();
+//				} catch (SQLException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 	}
 
 	/**

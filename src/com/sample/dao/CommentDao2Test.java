@@ -147,7 +147,7 @@ public class CommentDao2Test {
 		SqlSession session = openSqlSession();
 
 		CommentDao2 dao = session.getMapper(CommentDao2.class);
-		List<Comment2> list = dao.selectUserByUserName(userName);
+		List<Comment2> list = dao.selectUsersByUserName(userName);
 		for (Comment2 c : list) {
 			System.out.println("id: " + c.getId());
 			System.out.println("userName: " + c.getUserName());

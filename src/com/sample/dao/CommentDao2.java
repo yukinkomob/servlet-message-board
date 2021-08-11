@@ -49,7 +49,7 @@ public interface CommentDao2 {
 	 */
 	@ResultMap("commentResult1")
 	@Select("select * from user where user_name = #{userName}")
-	List<Comment2> selectUserByUserName(String userName);
+	List<Comment2> selectUsersByUserName(String userName);
 
 	/**
 	 * 最新のコメントIDを取得（かつ今回登録したコメント内容と合致するコメントのIDであること）
